@@ -1,0 +1,13 @@
+# Node.js / Electron
+node_modules/
+dist/
+build/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# IDE and user data
+.idea/
+user_data/

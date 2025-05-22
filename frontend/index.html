@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Przygotuj wycenę</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<!-- Top Bar with Hamburger -->
+<div id="top-bar">
+  <button id="menu-toggle" class="hamburger">☰</button>
+  <span class="app-title">AutoWycena</span>
+</div>
+
+<!-- Sidebar Menu -->
+<div id="sidebar">
+  <ul>
+<li onclick="showSection('home')">🏠 Strona główna</li>
+  <li onclick="showSection('settings')">⚙️ Ustawienia</li>
+<li onclick="showSection('help')">❓ Pomoc</li>
+
+  </ul>
+</div>
+<div class="main-wrapper">
+<div class="container" id="home">
+  <h1>Przygotuj wycenę</h1>
+  
+  <div class="form-group">
+    <input type="text" id="inputBox" placeholder="Wprowadź dane">
+    <button onclick="sendToPython()" class="primary-btn">Dodaj</button>
+  </div>
+  
+  <p id="result" class="result-text"></p>
+
+  <div class="actions">
+    <button onclick="runOptionA()" class="secondary-btn">Otwórz Excel Kalkulacje</button>
+    <button onclick="runOptionB()" class="secondary-btn">Otwórz Excel Zamówienia</button>
+  </div>
+</div>
+<div class="container" id="settings" style="display: none;">
+  <h1>Ustawienia</h1>
+
+  <div class="settings-group">
+    <button  onclick="newExcel()" class="primary-btn">Załaduj nowy arkusz</button>
+  </div>
+
+  <div class="settings-group">
+    <label for="orderPath">Ścieżka do Excel – Zamówienia</label>
+    <div class="input-row">
+      <input type="text" id="orderPath" placeholder="Wklej ścieżkę...">
+      <button onclick="sendToPython_Orders()" class="icon-button">📁</button>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <label for="folderPath">Ścieżka do Folderu</label>
+    <div class="input-row">
+      <input type="text" id="folderPath" placeholder="Wklej ścieżkę...">
+      <button onclick="chooseFilePathCalculation()" class="icon-button">📁</button>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <label for="resultsCount">Ile wyników wyświetlać:</label>
+    <select id="resultsCount" name="resultsCount">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select>
+  </div>
+  <div class="settings-group" style="text-align: center; margin-top: 2rem;">
+  <button onclick="saveSettings()" class="primary-btn" style="max-width: 200px;">Zapisz</button>
+</div>
+</div>
+
+
+<div class="container" id="help" style="display: none;">
+  <h1>Pomoc</h1>
+  <p>🚨 W razie poważnego problemu... zrób sobie kawę i spróbuj ponownie za 5 minut.</p>
+
+</div>
+
+</div>
+
+
+<script>
+ 
+  let loadingInterval;
+  let dotCount = 0;
+
+  function animateLoading() {
+    const result = document.getElementById("result");
+    dotCount = 0;
+    loadingInterval = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      result.textContent = "Loading" + ".".repeat(dotCount);
+    }, 500);
+  }
+
+  function stopLoading(message) {
+    clearInterval(loadingInterval);
+    document.getElementById("result").textContent = message;
+  }
+
+  function checkBackend(timeout = 15000, interval = 1000) {
+    const result = document.getElementById("result");
+    animateLoading();
+
+    const startTime = Date.now();
+
+    const checker = setInterval(() => {
+      fetch("http://localhost:8000/ping")
+        .then(response => response.json())
+        .then(data => {
+          clearInterval(checker);
+          stopLoading(data.message || "API ready");
+        })
+        .catch(() => {
+          const elapsed = Date.now() - startTime;
+          if (elapsed >= timeout) {
+            clearInterval(checker);
+            stopLoading("API not available");
+          }
+        });
+    }, interval);
+  }
+
+  window.onload = () => {
+    checkBackend();
+  };
+
+
+
+  function sendToPython() {
+    const name = document.getElementById("inputBox").value;
+    animateLoading();
+
+    fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(name)}`)
+      .then(response => response.json())
+      .then(data => {
+        stopLoading(data.message);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        stopLoading("Failed to contact API");
+      });
+  }
+
+    function saveSettings() {
+    const name = document.getElementById("orderPath").value;
+    animateLoading();
+
+    fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(name)}`)
+      .then(response => response.json())
+      .then(data => {
+        stopLoading(data.message);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        stopLoading("Failed to contact API");
+      });
+
+    const name2 = document.getElementById("folderPath").value;
+      fetch(`http://localhost:8000/api/calculation?name=${encodeURIComponent(name2)}`)
+      .then(response => response.json())
+      .then(data => {
+        stopLoading(data.message);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        stopLoading("Failed to contact API");
+      });
+
+      const resultsCount = document.getElementById("resultsCount").value;
+      fetch(`http://localhost:8000/api/number_elem?name=${encodeURIComponent(resultsCount)}`)
+      .then(response => response.json())
+      .then(data => {
+        stopLoading(data.message);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        stopLoading("Failed to contact API");
+      });
+  }
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const menuToggle = document.getElementById('menu-toggle');
+  const sidebar = document.getElementById('sidebar');
+
+  menuToggle.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+  });
+});
+
+function showSection(sectionId) {
+  const sections = document.querySelectorAll('.container');
+  sections.forEach(sec => sec.style.display = 'none');
+
+  const target = document.getElementById(sectionId);
+  if (target) {
+    target.style.display = 'block';
+    target.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ✅ Close sidebar after selecting a section
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function chooseFilePathOrders() {
+  alert("Tutaj otworzysz okno eksploratora plików.");
+}
+
+function chooseFilePathCalculation() {
+  alert("Tutaj otworzysz okno eksploratora plików.");
+}
+
+
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+
+
+
+  function runOptionA() {
+    fetch("http://localhost:8000/api/openExcel1")
+  }
+
+  function runOptionB() {
+    fetch("http://localhost:8000/api/openExcel2")
+  }
+
+  function newExcel() {
+    fetch("http://localhost:8000/api/new_Excel")
+  }
+
+  function sendToPython_Orders() {
+    fetch("http://localhost:8000/api/Orders_dialog")
+  }
+
+  function chooseFilePathCalculation() {
+    fetch("http://localhost:8000/api/Folder_dialog")
+  }
+
+  
+
+
+    window.onload = checkBackend;
+</script>
+</body>
+</html>
