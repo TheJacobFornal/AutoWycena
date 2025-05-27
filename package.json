@@ -8,13 +8,13 @@
     "build": "electron-builder"
   },
   "devDependencies": {
-    "electron": "^28.1.0",
+    "electron": "^28.3.3",
     "electron-builder": "^24.13.3"
   },
   "build": {
     "appId": "com.yourcompany.appszefa",
     "productName": "AutoWycena",
-    "icon": "icon.ico",     
+    "icon": "icon.ico",
     "directories": {
       "output": "dist"
     },
@@ -24,17 +24,18 @@
       "renderer.js",
       "package.json"
     ],
-  "extraResources": [
-    {
-      "from": "dist/app.exe",
-      "to": "app.exe"
-    }
-  ],
+    "extraResources": [
+      {
+        "from": "dist/app.exe",
+        "to": "app.exe"
+      }
+    ],
     "win": {
       "target": "nsis"
     }
   },
   "dependencies": {
+    "electron-store": "^8.2.0",
     "tree-kill": "^1.2.2"
   }
 }

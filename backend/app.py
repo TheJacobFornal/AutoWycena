@@ -39,18 +39,17 @@ def create_app():
     def say_hello(name: str = Query(...)):
         if not name.strip():
             raise HTTPException(status_code=400, detail="Name cannot be empty")
-        main.set_oerder_path(name)
-        print(f"Received name: {name}")
-        return {"message": f"Path: {name}!"}
+        resolved = main.set_oerder_path(name)
+        return {"message": f"Ścieżka ustawiona", "path": str(resolved)}
+
 
     @app.get("/api/calculation")
     def say_hello(name: str = Query(...)):
         if not name.strip():
             raise HTTPException(status_code=400, detail="Name cannot be empty")
+        resolved = main.set_calculaion_path(name)
+        return {"message": f"Ścieżka ustawiona", "path": str(resolved)}
 
-        main.set_calculaion_path(name)
-        print(f"Received name: {name}")
-        return {"message": f"Path2: {name}!"}
     
     @app.get("/api/number_elem")
     def say_hello(name: str = Query(...)):
@@ -74,7 +73,12 @@ def create_app():
 
     @app.get("/api/new_Excel")
     def open_Excel3():
-        main.copy_template()
+        try:
+            main.copy_template()
+            return {"message": "Nowy arkusz został załadowany!"}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Błąd podczas kopiowania arkusza: {str(e)}")
+
 
 
 

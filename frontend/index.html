@@ -66,7 +66,7 @@
     <select id="resultsCount" name="resultsCount">
       <option value="1">1</option>
       <option value="2">2</option>
-      <option value="3">3</option>
+      <option value="3" selected>3</option>
       <option value="4">4</option>
       <option value="5">5</option>
       <option value="6">6</option>
@@ -139,57 +139,71 @@
 
 
 
-  function sendToPython() {
-    const name = document.getElementById("inputBox").value;
-    animateLoading();
+function sendToPython() {
+  const name = document.getElementById("inputBox").value;
+  animateLoading();
 
-    fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(name)}`)
-      .then(response => response.json())
-      .then(data => {
-        stopLoading(data.message);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        stopLoading("Failed to contact API");
-      });
-  }
+  fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(name)}`)
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw err; });
+      }
+      return response.json();
+    })
+    .then(data => {
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      const message = error?.detail || "Failed to contact API";
+      stopLoading(message);  // ✅ Show this in <p id="result">
+    });
+}
+
 
     function saveSettings() {
-    const name = document.getElementById("orderPath").value;
-    animateLoading();
+  const orderValue = document.getElementById("orderPath").value;
+  const calcValue = document.getElementById("folderPath").value;
 
-    fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(name)}`)
-      .then(response => response.json())
-      .then(data => {
-        stopLoading(data.message);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        stopLoading("Failed to contact API");
-      });
+  animateLoading();
 
-    const name2 = document.getElementById("folderPath").value;
-      fetch(`http://localhost:8000/api/calculation?name=${encodeURIComponent(name2)}`)
-      .then(response => response.json())
-      .then(data => {
-        stopLoading(data.message);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        stopLoading("Failed to contact API");
-      });
+  fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(orderValue)}`)
+    .then(response => {
+      if (!response.ok) return response.json().then(err => { throw err; });
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById("orderPath").value = data.path;  // ✅ update input
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      stopLoading(error?.detail || "Nie udało się ustawić ścieżki zamówień.");
+    });
 
-      const resultsCount = document.getElementById("resultsCount").value;
-      fetch(`http://localhost:8000/api/number_elem?name=${encodeURIComponent(resultsCount)}`)
-      .then(response => response.json())
-      .then(data => {
-        stopLoading(data.message);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        stopLoading("Failed to contact API");
-      });
-  }
+  fetch(`http://localhost:8000/api/calculation?name=${encodeURIComponent(calcValue)}`)
+    .then(response => {
+      if (!response.ok) return response.json().then(err => { throw err; });
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById("folderPath").value = data.path;  // ✅ update input
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      stopLoading(error?.detail || "  ");
+    });
+
+  const resultsCount = document.getElementById("resultsCount").value;
+  fetch(`http://localhost:8000/api/number_elem?name=${encodeURIComponent(resultsCount)}`)
+    .then(response => response.json())
+    .then(data => {
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      stopLoading(error?.detail || "Błąd ustawiania liczby wyników");
+    });
+}
+
+  
 
 
 
@@ -236,25 +250,96 @@ function scrollToSection(id) {
 
 
 
-  function runOptionA() {
-    fetch("http://localhost:8000/api/openExcel1")
-  }
+function runOptionA() {
+  animateLoading();
+
+  fetch("http://localhost:8000/api/openExcel1")
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw err; });
+      }
+      return response.json();
+    })
+    .then(data => {
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      const message = error?.detail || "Excel Kalkulacja otwieram ...";
+      stopLoading(message);
+    });
+}
+
 
   function runOptionB() {
     fetch("http://localhost:8000/api/openExcel2")
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw err; });
+      }
+      return response.json();
+    })
+    .then(data => {
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      const message = error?.detail || "Excel Zamówienia otwieram ...";
+      stopLoading(message);
+    });
   }
 
-  function newExcel() {
-    fetch("http://localhost:8000/api/new_Excel")
-  }
+function newExcel() {
+  animateLoading();
 
-  function sendToPython_Orders() {
-    fetch("http://localhost:8000/api/Orders_dialog")
-  }
+  fetch("http://localhost:8000/api/new_Excel")
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw err; });
+      }
+      return response.json();
+    })
+    .then(data => {
+      stopLoading(data.message);
+    })
+    .catch(error => {
+      const message = error?.detail || "    ";
+      stopLoading(message);
+    });
+}
 
-  function chooseFilePathCalculation() {
-    fetch("http://localhost:8000/api/Folder_dialog")
-  }
+
+function sendToPython_Orders() {
+  animateLoading();
+  fetch("http://localhost:8000/api/Orders_dialog")
+    .then(response => {
+      if (!response.ok) return response.json().then(err => { throw err; });
+      return response.json();
+    })
+    .then(data => {
+      stopLoading(data.message);
+      document.getElementById("orderPath").value = data.path;  // ✅ update input
+    })
+    .catch(error => {
+      stopLoading(error?.detail || "   ");
+    });
+}
+
+
+function chooseFilePathCalculation() {
+  animateLoading();
+  fetch("http://localhost:8000/api/Folder_dialog")
+    .then(response => {
+      if (!response.ok) return response.json().then(err => { throw err; });
+      return response.json();
+    })
+    .then(data => {
+      stopLoading(data.message);
+      document.getElementById("folderPath").value = data.path;  // ✅ update input
+    })
+    .catch(error => {
+      stopLoading(error?.detail || "     ");
+    });
+}
+
 
   
 

@@ -2,6 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const treeKill = require('tree-kill');
+const { exec } = require('child_process');
 
 let pythonProcess = null;
 
@@ -61,20 +62,24 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-app.on('window-all-closed', () => {
-  console.log("Closing app, killing backend...");
 
-  if (pythonProcess && typeof pythonProcess.pid === 'number' && !pythonProcess.killed) {
-    treeKill(pythonProcess.pid, 'SIGTERM');
-  }
-
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
 
 app.on('before-quit', () => {
   if (pythonProcess && typeof pythonProcess.pid === 'number' && !pythonProcess.killed) {
     treeKill(pythonProcess.pid, 'SIGTERM');
   }
+
+  // Fallback: kill any remaining app.exe by name
+  exec('taskkill /F /IM app.exe', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`taskkill error: ${error.message}`);
+    }
+    if (stderr) {
+      console.error(`taskkill stderr: ${stderr}`);
+    }
+    if (stdout) {
+      console.log(`taskkill stdout: ${stdout}`);
+    }
+  });
 });
+

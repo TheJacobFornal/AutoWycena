@@ -8,15 +8,17 @@ from pathlib import Path
 import shutil
 import tkinter as tk
 from tkinter import filedialog
+from fastapi import HTTPException
 
-#curr_dir = Path(__file__).parent
-#main_dir = curr_dir.parent
-#excel_dir = main_dir / "Excel"
-#excel_estimate_path = excel_dir / "_kalkulacja edit.xlsx"
+orders_path = None
+excel_estimate_path = None
+template_calculation = None
+number_of_elem = 3
+
 
 template_path = r"C:\Users\Jacob_Champ\Desktop\Excel\kalulacje_template.xlsx"
 
-number_of_elem = 3
+
 ### Part 0 ###
 def check_if_excel_open(path):
     try:
@@ -25,28 +27,46 @@ def check_if_excel_open(path):
     except IOError:
         return True
 
-
 def main(elem_id):
     global number_of_elem
-    if check_if_excel_open(excel_estimate_path):
-        print("Excel opened, close it to start program")
-        sys.exit()
 
-    print("elem: ", elem_id, flush=True)
-    print("elem neum: ", number_of_elem, flush=True)
-    part_1.main(elem_id, orders_path, excel_estimate_path,  number_of_elem)
-    print("elem id: main xddd", elem_id)
+    path1 = Path(orders_path) if isinstance(orders_path, str) else orders_path
+    path2 = Path(excel_estimate_path) if isinstance(excel_estimate_path, str) else excel_estimate_path
+
+    if not path1 or not path2:
+        raise HTTPException(status_code=400, detail="Ścieżki do plików Excel nie zostały ustawione.")
+    if not path1.exists():
+        raise HTTPException(status_code=404, detail=f"Plik nie istnieje: {path1}")
+    if not path2.exists():
+        raise HTTPException(status_code=404, detail=f"Plik nie istnieje: {path2}")
+    if check_if_excel_open(path2):
+        raise HTTPException(status_code=400, detail="Excel Kalkulacja jest otwarty. Zamknij plik, aby kontynuować.")
+
+    result = part_1.main(elem_id, path1, path2, number_of_elem)
+
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Nie znaleziono ID: {elem_id} w pliku Zamówienia.")
+
+
+
 
 
 def open_Excel_calculation():
-    if 'excel_estimate_path' not in globals() and not excel_estimate_path.exists():
-        return
+    if 'excel_estimate_path' not in globals() or excel_estimate_path is None:
+        raise HTTPException(status_code=400, detail="Excel Kalkulacja nie ustawiony")
+    if not excel_estimate_path.exists():
+        raise HTTPException(status_code=404, detail="Excel Kalkulacja nie ustawiony")
     os.startfile(excel_estimate_path)
+    return {"message": "Excel Kalkulacja Otwarty"}
+
 
 def open_Excel_orders():
-    if 'orders_path' not in globals() and orders_path.exists():
-        return
+    if 'orders_path' not in globals() or orders_path is None:
+        raise HTTPException(status_code=400, detail="Excel Zamówienia nie ustawiony")
+    if not excel_estimate_path.exists():
+        raise HTTPException(status_code=404, detail="Excel Zamówienia nie ustawiony")
     os.startfile(orders_path)
+    return {"message": "Excel Zamówienia Otwarty"}
 
 def copy_template():
     shutil.copy(template_calculation, excel_estimate_path)
@@ -58,7 +78,6 @@ def set_oerder_path(path):
         os.startfile(orders_path)
 
 def set_calculaion_path(folder_path):
-    print("Kubaaa")
     global excel_estimate_path, template_calculation
     folder = Path(folder_path)
     template_calculation = folder / "calculation_template.xlsx"
@@ -94,12 +113,10 @@ def select_folder():
     return folder_path
     
 def dialog_orders():
-    print("szef", flush=True)
     global orders_path
     orders_path = select_file()
     
 def dialog_folder():
-    print("folder", flush=True)
     folder = select_folder()
     set_calculaion_path(folder)
 

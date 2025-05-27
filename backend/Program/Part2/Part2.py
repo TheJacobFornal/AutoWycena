@@ -28,13 +28,16 @@ def insert_date(row, task_table):
     for elem in task_table:
         task = elem[0]
         value = elem[1]
+        if isinstance(value, str):
+            value = value.strip()
         ws.cell(row, task).value = value
 
+
 def insert_id(elem_id, row):
+    elem_id = elem_id.strip()
     ws.cell(row, 5).value = elem_id
 
 def main(elem_id, task_table, excel_estimate_path):
-    print("kbua", flush=True)
     global ws
     wb = load_workbook(excel_estimate_path)
     ws = wb.active

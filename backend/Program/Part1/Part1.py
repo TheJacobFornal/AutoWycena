@@ -35,11 +35,11 @@ Excel_map_1 = {
     14: 38,
 
     18: 8,
-    19: 11,
-    20: 12,
-    21: 13,
-    22: 14,
-    23: 15
+    19: 13,
+    20: 14,
+    21: 15,
+    22: 11,
+    23: 12
 }
 
 Excel_map_2 = {
@@ -56,11 +56,11 @@ Excel_map_2 = {
     15: 38,
 
     19: 8,
-    20: 11,
-    21: 12,
-    22: 13,
-    23: 14,
-    24: 15
+    20: 13,
+    21: 14,
+    22: 15,
+    23: 11,
+    24: 12
 }
 
 task_table = []
@@ -128,17 +128,17 @@ def get_name_quantity(ws, row):
 
 def get_dimenstions(ws, row):
     if newer_Excel(ws):
-        a_col = 22
-        b_col = 23
-        c_col = 24
-        diameter_col = 20
-        length_col = 21
+        a_col = 20
+        b_col = 21
+        c_col = 22
+        diameter_col = 23
+        length_col = 24
     else:
-        a_col = 21
-        b_col = 22
-        c_col = 23
-        diameter_col = 19
-        length_col = 20
+        a_col = 19
+        b_col = 20
+        c_col = 21
+        diameter_col = 22
+        length_col = 23
 
     a = ws.cell(row, a_col)
     b = ws.cell(row, b_col)
@@ -157,24 +157,22 @@ def get_dimenstions(ws, row):
         add_to_table(ws, row, length_col)
 
 
-def get_line(target_id,  number_of_elem): 
-    print("elem neum from part1: ", number_of_elem, flush=True)                                      # find lines with index
+def get_line(target_id, number_of_elem): 
     global excel_estimate_path
     counter = 0
+    found_any = False
     finish = False
+
     for sheet in reversed(get_month_sheet()):
-        print("for 1", flush=True)
         ws = wb[sheet]
         if finish:
-            print("break main for", flush=True)
             break
 
         for row in range(2, ws.max_row + 1):
-            
             if int(counter) >= int(number_of_elem):
                 finish = True
-                print("finish: set", flush=True)
                 break
+
             cell_value = ws.cell(row=row, column=4).value
             value = str(cell_value).strip()
             if str(value) == target_id:
@@ -184,26 +182,25 @@ def get_line(target_id,  number_of_elem):
                 get_name_quantity(ws, row)
                 get_dimenstions(ws, row)
                 look_for_operation(ws, row)
-                print(task_table)
                 part_2.main(target_id, task_table, excel_estimate_path)
                 task_table.clear()
                 counter += 1
-                
-                print("  ")
+                found_any = True
+
+    return found_any
+
        
 
 
 
 
 
-def main(index, orders_path_f, excel_estimate_path_f,  number_of_elem):
+def main(index, orders_path_f, excel_estimate_path_f, number_of_elem):
     global orders_path, excel_estimate_path, wb
     orders_path = orders_path_f
     excel_estimate_path = excel_estimate_path_f
-   
+
     wb = load_workbook(orders_path)
-    ws = wb.active
-
-    get_line(index,  number_of_elem)
-
+    result = get_line(index, number_of_elem)
+    return result
 
