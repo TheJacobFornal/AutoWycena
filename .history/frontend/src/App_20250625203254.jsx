@@ -12,19 +12,16 @@ export default function App() {
 
 
 
-  
-const sendToPython = () => {
-  setResult("Ładowanie..."); // ✅ Set loading message before fetch starts
 
-  fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
-    .then(r => r.json())
-    .then(d => setResult(d.message)) // ✅ Show API response message
-    .catch(err => {
-      console.error(err);
-      setResult("Błąd połączenia z API");
-    });
-};
 
+
+  const sendToPython = () => {
+
+    fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
+      .then(r => r.json())
+      .then(d => setResult(d.message))
+      .catch(err => console.error(err));
+  };
 
   const saveSettings = () => {
 

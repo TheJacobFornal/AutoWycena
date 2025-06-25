@@ -9,24 +9,26 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    checkBackend();
+  }, []);
+
+  const animateLoading = () => {
+    console.log('Loading...');
+  };
 
 
 
-  
-const sendToPython = () => {
-  setResult("Ładowanie..."); // ✅ Set loading message before fetch starts
-
-  fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
-    .then(r => r.json())
-    .then(d => setResult(d.message)) // ✅ Show API response message
-    .catch(err => {
-      console.error(err);
-      setResult("Błąd połączenia z API");
-    });
-};
-
+  const sendToPython = () => {
+    animateLoading();
+    fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
+      .then(r => r.json())
+      .then(d => setResult(d.message))
+      .catch(err => console.error(err));
+  };
 
   const saveSettings = () => {
+    animateLoading();
 
     fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(orderPath)}`)
       .then(r => r.json())
@@ -51,7 +53,7 @@ const sendToPython = () => {
   };
 
   const runOptionA = () => {
-
+    animateLoading();
     fetch('http://localhost:8000/api/openExcel1')
       .then(r => r.json())
       .then(d => setResult(d.message))
@@ -59,7 +61,7 @@ const sendToPython = () => {
   };
 
   const runOptionB = () => {
-  
+    animateLoading();
     fetch('http://localhost:8000/api/openExcel2')
       .then(r => r.json())
       .then(d => setResult(d.message))
@@ -67,7 +69,7 @@ const sendToPython = () => {
   };
 
   const newExcel = () => {
- 
+    animateLoading();
     fetch('http://localhost:8000/api/new_Excel')
       .then(r => r.json())
       .then(d => setResult(d.message))
@@ -75,7 +77,7 @@ const sendToPython = () => {
   };
 
   const sendToPython_Orders = () => {
-   
+    animateLoading();
     fetch('http://localhost:8000/api/Orders_dialog')
       .then(r => r.json())
       .then(d => {
@@ -86,7 +88,7 @@ const sendToPython = () => {
   };
 
   const chooseFilePathCalculation = () => {
- 
+    animateLoading();
     fetch('http://localhost:8000/api/Folder_dialog')
       .then(r => r.json())
       .then(d => {

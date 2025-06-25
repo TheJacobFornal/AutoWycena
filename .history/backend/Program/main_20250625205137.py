@@ -47,7 +47,7 @@ def main(elem_id):
     if not result:
         return {"status": "error", "message": f"Nie znaleziono ID: {elem_id} w pliku Zamówienia."}
 
-    return {"status": "success", "message": f"Dodano: {elem_id}."}
+    return {"status": "success", "message": f"Sukces: znaleziono dane dla ID {elem_id}."}
 
 
 

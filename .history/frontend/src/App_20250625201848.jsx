@@ -8,93 +8,88 @@ export default function App() {
   const [resultsCount, setResultsCount] = useState('3');
   const [activeSection, setActiveSection] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loadingInterval, setLoadingInterval] = useState(null);
+
+  useEffect(() => {
+    checkBackend();
+  }, []);
 
 
+  const checkBackend = (timeout = 15000, interval = 1000) => {
+  const checker = setInterval(() => {
+      fetch('http://localhost:8000/api/ping')
+        .then(r => r.json())
+        .then(d => {
+          setResult("API Ready")
+        })
+        .catch(() => {
+          setResult("Error API")
+        });
+    }, );
+  };
 
-
-  
-const sendToPython = () => {
-  setResult("Ładowanie..."); // ✅ Set loading message before fetch starts
-
+ const sendToPython = () => {
+  animateLoading();
   fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
     .then(r => r.json())
-    .then(d => setResult(d.message)) // ✅ Show API response message
-    .catch(err => {
-      console.error(err);
-      setResult("Błąd połączenia z API");
-    });
+    .catch(); // You may still want to log the error here
 };
 
+const saveSettings = () => {
+  animateLoading();
+  fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(orderPath)}`)
+    .then(r => r.json())
+    .then(d => setOrderPath(d.path))
+    .catch();
 
-  const saveSettings = () => {
+  fetch(`http://localhost:8000/api/calculation?name=${encodeURIComponent(folderPath)}`)
+    .then(r => r.json())
+    .then(d => setFolderPath(d.path))
+    .catch();
 
-    fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(orderPath)}`)
-      .then(r => r.json())
-      .then(d => {
-        setOrderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
+  fetch(`http://localhost:8000/api/number_elem?name=${encodeURIComponent(resultsCount)}`)
+    .then(r => r.json())
+    .catch();
+};
 
-    fetch(`http://localhost:8000/api/calculation?name=${encodeURIComponent(folderPath)}`)
-      .then(r => r.json())
-      .then(d => {
-        setFolderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
+const runOptionA = () => {
+  animateLoading();
+  fetch('http://localhost:8000/api/openExcel1')
+    .then(r => r.json())
+    .catch();
+};
 
-    fetch(`http://localhost:8000/api/number_elem?name=${encodeURIComponent(resultsCount)}`)
-      .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
-  };
+const runOptionB = () => {
+  animateLoading();
+  fetch('http://localhost:8000/api/openExcel2')
+    .then(r => r.json())
+    .catch();
+};
 
-  const runOptionA = () => {
+const newExcel = () => {
+  animateLoading();
+  fetch('http://localhost:8000/api/new_Excel')
+    .then(r => r.json())
+    .then(d => set) // ← This is incomplete – you likely meant `setSomething(d.something)`
+    .catch();
+};
 
-    fetch('http://localhost:8000/api/openExcel1')
-      .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
-  };
+const sendToPython_Orders = () => {
+  animateLoading();
+  fetch('http://localhost:8000/api/Orders_dialog')
+    .then(r => r.json())
+    .then(d => setOrderPath(d.path))
+    .catch();
+};
 
-  const runOptionB = () => {
-  
-    fetch('http://localhost:8000/api/openExcel2')
-      .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
-  };
+const chooseFilePathCalculation = () => {
+  animateLoading();
+  fetch('http://localhost:8000/api/Folder_dialog')
+    .then(r => r.json())
+    .then(d => setFolderPath(d.path))
+    .catch();
+};
 
-  const newExcel = () => {
- 
-    fetch('http://localhost:8000/api/new_Excel')
-      .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
-  };
-
-  const sendToPython_Orders = () => {
-   
-    fetch('http://localhost:8000/api/Orders_dialog')
-      .then(r => r.json())
-      .then(d => {
-        setOrderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
-  };
-
-  const chooseFilePathCalculation = () => {
- 
-    fetch('http://localhost:8000/api/Folder_dialog')
-      .then(r => r.json())
-      .then(d => {
-        setFolderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
-  };
 
   return (
     <>
@@ -102,7 +97,6 @@ const sendToPython = () => {
         <button id="menu-toggle" className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
         <span className="app-title">AutoWycena</span>
       </div>
-
       <div id="sidebar" className={sidebarOpen ? 'open' : ''}>
         <ul>
           <li onClick={() => { setActiveSection('home'); setSidebarOpen(false); }}>🏠 Strona Home</li>
@@ -110,17 +104,11 @@ const sendToPython = () => {
           <li onClick={() => { setActiveSection('help'); setSidebarOpen(false); }}>❓ Pomoc</li>
         </ul>
       </div>
-
       <div className="main-wrapper">
         <div className="container" style={{ display: activeSection === 'home' ? 'block' : 'none' }}>
           <h1>Przygotuj wycenę</h1>
           <div className="form-group">
-            <input
-              type="text"
-              placeholder="Wprowadź dane"
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-            />
+            <input type="text" placeholder="Wprowadź dane" value={inputValue} onChange={e => setInputValue(e.target.value)} />
             <button onClick={sendToPython} className="primary-btn">Dodaj</button>
           </div>
           <p className="result-text">{result}</p>
@@ -135,21 +123,13 @@ const sendToPython = () => {
           <div className="settings-group">
             <button onClick={newExcel} className="primary-btn">Załaduj nowy arkusz</button>
           </div>
-
           <div className="settings-group">
             <label htmlFor="orderPath">Ścieżka do Excel – Zamówienia</label>
             <div className="input-row">
-              <input
-                type="text"
-                id="orderPath"
-                value={orderPath}
-                onChange={e => setOrderPath(e.target.value)}
-                placeholder="Wklej ścieżke..."
-              />
+              <input type="text" id="orderPath" value={orderPath} onChange={e => setOrderPath(e.target.value)} placeholder="Wklej ścieżke..." />
               <button onClick={sendToPython_Orders} className="icon-button">📁</button>
             </div>
           </div>
-
           <div className="settings-group">
             <label htmlFor="folderPath">Ścieżka do Folderu</label>
             <div className="input-row">
@@ -161,22 +141,15 @@ const sendToPython = () => {
                 onChange={e => setFolderPath(e.target.value)}
               />
               <button onClick={chooseFilePathCalculation} className="icon-button">📁</button>
+
             </div>
           </div>
-
           <div className="settings-group">
             <label htmlFor="resultsCount">Ile wyników wyświetlić:</label>
-            <select
-              id="resultsCount"
-              value={resultsCount}
-              onChange={e => setResultsCount(e.target.value)}
-            >
-              {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
-                <option key={n} value={n}>{n}</option>
-              ))}
+            <select id="resultsCount" value={resultsCount} onChange={e => setResultsCount(e.target.value)}>
+              {Array.from({ length: 10 }, (_, i) => i + 1).map(n => <option key={n} value={n}>{n}</option>)}
             </select>
           </div>
-
           <div className="settings-group" style={{ textAlign: 'center', marginTop: '2rem' }}>
             <button onClick={saveSettings} className="primary-btn" style={{ maxWidth: '200px' }}>Zapisz</button>
           </div>
@@ -184,7 +157,7 @@ const sendToPython = () => {
 
         <div className="container" style={{ display: activeSection === 'help' ? 'block' : 'none' }}>
           <h1>Pomoc</h1>
-          <p>🚨 W razie poważnego problemu... zrób sobie kawę i spróbuj ponownie za 5 minut.</p>
+          <p>🚨 W razie powa\u017cnego problemu... zr\u00f3b sobie kaw\u0119 i spr\u00f3buj ponownie za 5 minut.</p>
         </div>
       </div>
     </>

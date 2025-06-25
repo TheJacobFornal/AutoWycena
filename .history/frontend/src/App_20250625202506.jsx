@@ -9,91 +9,85 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    checkBackend();
+  }, []);
 
+  const animateLoading = () => {
+    console.log('Loading...'); // You can replace this with a spinner or state
+  };
 
+  const checkBackend = (timeout = 15000, interval = 1000) => {
+    setInterval(() => {
+      fetch('http://localhost:8000/api/ping')
+        .then(r => r.json())
+        .then(() => setResult('API Ready'))
+        .catch(() => setResult('Error API'));
+    }, interval);
+  };
 
-  
-const sendToPython = () => {
-  setResult("Ładowanie..."); // ✅ Set loading message before fetch starts
-
-  fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
-    .then(r => r.json())
-    .then(d => setResult(d.message)) // ✅ Show API response message
-    .catch(err => {
-      console.error(err);
-      setResult("Błąd połączenia z API");
-    });
-};
-
+  const sendToPython = () => {
+    animateLoading();
+    fetch(`http://localhost:8000/api/submit_number?name=${encodeURIComponent(inputValue)}`)
+      .then(r => r.json()
+      ,setResult("dodano"))
+      .catch();
+  };
 
   const saveSettings = () => {
+    animateLoading();
 
     fetch(`http://localhost:8000/api/orders?name=${encodeURIComponent(orderPath)}`)
       .then(r => r.json())
-      .then(d => {
-        setOrderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
+      .then(d => setOrderPath(d.path))
+      .catch();
 
     fetch(`http://localhost:8000/api/calculation?name=${encodeURIComponent(folderPath)}`)
       .then(r => r.json())
-      .then(d => {
-        setFolderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
+      .then(d => setFolderPath(d.path))
+      .catch();
 
     fetch(`http://localhost:8000/api/number_elem?name=${encodeURIComponent(resultsCount)}`)
       .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
+      .catch();
   };
 
   const runOptionA = () => {
-
+    animateLoading();
     fetch('http://localhost:8000/api/openExcel1')
       .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
+      .catch();
   };
 
   const runOptionB = () => {
-  
+    animateLoading();
     fetch('http://localhost:8000/api/openExcel2')
       .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
+      .catch();
   };
 
   const newExcel = () => {
- 
+    animateLoading();
     fetch('http://localhost:8000/api/new_Excel')
       .then(r => r.json())
-      .then(d => setResult(d.message))
-      .catch(err => console.error(err));
+      .then(d => console.log(d)) // Replaced invalid 'set'
+      .catch();
   };
 
   const sendToPython_Orders = () => {
-   
+    animateLoading();
     fetch('http://localhost:8000/api/Orders_dialog')
       .then(r => r.json())
-      .then(d => {
-        setOrderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
+      .then(d => setOrderPath(d.path))
+      .catch();
   };
 
   const chooseFilePathCalculation = () => {
- 
+    animateLoading();
     fetch('http://localhost:8000/api/Folder_dialog')
       .then(r => r.json())
-      .then(d => {
-        setFolderPath(d.path);
-        setResult(d.message);
-      })
-      .catch(err => console.error(err));
+      .then(d => setFolderPath(d.path))
+      .catch();
   };
 
   return (

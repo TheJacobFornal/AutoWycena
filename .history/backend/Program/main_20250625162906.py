@@ -34,21 +34,18 @@ def main(elem_id):
     path2 = Path(excel_estimate_path) if isinstance(excel_estimate_path, str) else excel_estimate_path
 
     if not path1 or not path2:
-        return {"status": "error", "message": "Ścieżki do plików Excel nie zostały ustawione."}
+        raise HTTPException(status_code=400, detail="Ścieżki do plików Excel nie zostały ustawione.")
     if not path1.exists():
-        return {"status": "error", "message": f"Plik nie istnieje: {path1}"}
+        raise HTTPException(status_code=404, detail=f"Plik nie istnieje: {path1}")
     if not path2.exists():
-        return {"status": "error", "message": f"Plik nie istnieje: {path2}"}
+        raise HTTPException(status_code=404, detail=f"Plik nie istnieje: {path2}")
     if check_if_excel_open(path2):
-        return {"status": "error", "message": "Excel Kalkulacja jest otwarty. Zamknij plik, aby kontynuować."}
+        raise HTTPException(status_code=400, detail="Excel Kalkulacja jest otwarty. Zamknij plik, aby kontynuować.")
 
     result = part_1.main(elem_id, path1, path2, number_of_elem)
 
     if not result:
-        return {"status": "error", "message": f"Nie znaleziono ID: {elem_id} w pliku Zamówienia."}
-
-    return {"status": "success", "message": f"Dodano: {elem_id}."}
-
+        raise HTTPException(status_code=404, detail=f"Nie znaleziono ID: {elem_id} w pliku Zamówienia.")
 
 
 
@@ -118,12 +115,10 @@ def select_folder():
 def dialog_orders():
     global orders_path
     orders_path = select_file()
-    return orders_path
     
 def dialog_folder():
     folder = select_folder()
     set_calculaion_path(folder)
-    return folder
 
 
 def set_number_of_elem(number):
