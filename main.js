@@ -19,7 +19,7 @@ function createWindow() {
     }
   });
 
-  win.loadFile(path.join(__dirname, 'frontend', 'index.html'));
+  win.loadFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
 
   // Kill backend if window is closed directly
   win.on('closed', () => {
