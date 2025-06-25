@@ -65,11 +65,13 @@ def create_app():
     
     @app.get("/api/openExcel1")
     def open_Excel1():
-        main.open_Excel_calculation()
+        """Open calculation Excel and return a status message."""
+        return main.open_Excel_calculation()
 
     @app.get("/api/openExcel2")
     def open_Excel2():
-        main.open_Excel_orders()
+        """Open orders Excel and return a status message."""
+        return main.open_Excel_orders()
 
     @app.get("/api/new_Excel")
     def open_Excel3():
