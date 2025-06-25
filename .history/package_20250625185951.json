@@ -12,7 +12,7 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.yourcompany.autoWycena",
+    "appId": "com.yourcompany.creoMate",
     "productName": "AutoWycena",
     "icon": "icon.ico",
     "directories": {
