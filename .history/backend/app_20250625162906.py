@@ -85,13 +85,11 @@ def create_app():
        
     @app.get("/api/Orders_dialog")
     def open_Excel3():
-        path = main.dialog_orders()  # Make sure this returns a string like "C:\\Users\\Docs\\orders.xlsx"
-        return {"path": path, "message": "Ścieżka została wybrana"}
+        main.dialog_orders()
        
     @app.get("/api/Folder_dialog")
     def open_Excel3():
-        path = main.dialog_folder()
-        return {"path": path, "message": "Ścieżka została wybrana"}
+        main.dialog_folder()
        
 
 
