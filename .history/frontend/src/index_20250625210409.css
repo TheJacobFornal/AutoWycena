@@ -139,8 +139,8 @@ text-align: center;
 }
 
 input[type="text"] {
-    padding: 8px 10px;
-    width: 100%;
+    padding: 8px 15px;
+    width: 130%;
     font-size: 1rem;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -289,7 +289,7 @@ button {
 .input-row {
   display: flex;
   align-items: center;
-  gap: 0px; /* Optional spacing between input and button */
+  gap: 0.5rem; /* Optional spacing between input and button */
   margin: 4px
 }
 
