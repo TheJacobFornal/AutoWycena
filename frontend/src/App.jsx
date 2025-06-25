@@ -171,7 +171,8 @@ export default function App() {
               <input
                 type="text"
                 id="folderPath"
-                placeholder={folderPath || 'Wklej ścieżkę...'}
+                value={folderPath}
+                placeholder="Wklej ścieżkę..."
                 onChange={e => setFolderPath(e.target.value)}
               />
               <button onClick={chooseFilePathCalculation} className="icon-button">📁</button>
