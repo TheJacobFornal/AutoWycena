@@ -19,10 +19,10 @@ function createWindow() {
 
   const isDev = !app.isPackaged;
 
-  if (isDev) {
+    if (isDev) {
     win.loadURL('http://localhost:3000');
   } else {
-    win.loadFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+    win.loadFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
   }
 
   // Kill backend if window is closed directly
