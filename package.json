@@ -19,7 +19,7 @@
     "output": "dist"
   },
   "files": [
-    "frontend/**/*",
+    "frontend/dist/**/*",
     "main.js",
     "renderer.js",
     "package.json"
