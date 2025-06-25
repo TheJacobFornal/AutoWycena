@@ -3,23 +3,27 @@ const path = require('path');
 const { spawn } = require('child_process');
 const treeKill = require('tree-kill');
 const { exec } = require('child_process');
-const { autoUpdater } = require('electron-updater');  // 👈 Add auto-updater
 
 let pythonProcess = null;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 600,
+    width: 1000,
     height: 600,
     icon: path.join(__dirname, 'icon.ico'),
     autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, 'rerenderer.js'),
       contextIsolation: true
     }
   });
 
-  win.loadFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+  const isDev = !app.isPackaged;
+
+  if (isDev) {
+    win.loadURL('http://localhost:3000');
+  } else {
+    win.loadFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+  }
 
   // Kill backend if window is closed directly
   win.on('closed', () => {
@@ -28,10 +32,6 @@ function createWindow() {
     }
   });
 
-  // ✅ Check for updates once window is loaded
-  win.webContents.on('did-finish-load', () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  });
 }
 
 app.setPath('userData', path.join(app.getPath('temp'), 'App_szefa'));
@@ -39,13 +39,16 @@ app.setPath('userData', path.join(app.getPath('temp'), 'App_szefa'));
 function startPythonBackend() {
   let exePath;
 
+  let args = [];
+
   if (app.isPackaged) {
     exePath = path.join(process.resourcesPath, 'app.exe');
   } else {
-    exePath = path.join(__dirname, 'dist', 'app.exe');
+    exePath = 'python';
+    args = [path.join(__dirname, 'backend', 'app.py')];
   }
 
-  pythonProcess = spawn(exePath, [], {
+  pythonProcess = spawn(exePath, args, {
     stdio: ['ignore', 'pipe', 'pipe']
   });
 
@@ -63,14 +66,6 @@ app.whenReady().then(() => {
   createWindow();
 });
 
-// 🔁 Optional update event logging
-autoUpdater.on('update-available', () => {
-  console.log('Update available.');
-});
-
-autoUpdater.on('update-downloaded', () => {
-  console.log('Update downloaded. Will install on quit.');
-});
 
 app.on('before-quit', () => {
   if (pythonProcess && typeof pythonProcess.pid === 'number' && !pythonProcess.killed) {
