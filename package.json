@@ -1,7 +1,7 @@
 {
-  "name": "App_szefa_3",
-  "version": "1.1.0",
-  "description": "AutoWycena",
+  "name": "CreoMate",
+  "version": "1.3.0",
+  "description": "CreoMate app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -12,33 +12,31 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-  "appId": "com.yourcompany.appszefa",
-  "productName": "AutoWycena",
-  "icon": "icon.ico",
-  "directories": {
-    "output": "dist"
-  },
-  "files": [
-    "frontend/dist/**/*",
-    "main.js",
-    "renderer.js",
-    "package.json"
-  ],
-  "win": {
-    "target": "nsis"
-  },
-  "publish": [
-    {
-      "provider": "github",
-      "owner": "TheJacobFornal",
-      "repo": "AutoWycena"
+    "appId": "com.yourcompany.creoMate",
+    "productName": "CreoMate",
+    "icon": "icon.ico",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "frontend/**/*",
+      "main.js",
+      "renderer.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/app.exe",
+        "to": "app.exe"
+      }
+    ],
+    "win": {
+      "target": "nsis"
     }
-  ]
-},
+  },
 
   "dependencies": {
     "electron-store": "^8.2.0",
-    "electron-updater": "^6.6.2",
     "tree-kill": "^1.2.2"
   }
 }
