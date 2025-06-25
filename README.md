@@ -11,6 +11,9 @@ npm install           # only needed once to install dependencies
 npm run build         # generates the `dist/` folder
 ```
 
+The React entry component is `App.jsx`. Ensure this file exists and is used when
+running or building the frontend.
+
 After building the frontend you can start the Electron app from the repository
 root:
 
